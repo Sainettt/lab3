@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <title><%= headTitle %></title>
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
+  <body>
+    <%- include("partials/navigation", { menuLinks, activeLinkPath }) %>
+
+    <main>
+      <h1 class="heading">Newest product</h1>
+      <% if (newestProduct?.name) { %>
+      <div class="product__info">
+        <p>
+          <strong class="product__label">Name:</strong>
+          <span class="product__value"><%= newestProduct.name %></span>
+        </p>
+        <p>
+          <strong class="product__label">Description:</strong>
+          <span class="product__value"><%= newestProduct.description %></span>
+        </p>
+      </div>
+      <% } else { %>
+      <p>No data available.</p>
+      <% } %>
+    </main>
+  </body>
+</html>

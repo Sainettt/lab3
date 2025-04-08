@@ -1,38 +1,45 @@
-const fileSystem = require("fs");
-const { STATUS_CODE } = require("../constants/statusCode");
+const express = require('express')
+const { STATUS_CODE } = require('../constants/statusCode')
+const { MENU_LINKS } = require('../constants/navigation')
+const productsSlice = require('../store/products')
 
-const path = require("path");
+const router = express.Router()
 
-const express = require("express");
+router.get('/', (_req, res) => {
+  res.render('products', {
+    headTitle: 'Shop – Products',
+    path: '/',
+    menuLinks: MENU_LINKS,
+    activeLinkPath: '/products',
+    products: productsSlice.products,
+  })
+})
 
-const renderNewProductPage = require("../views/renderNewProductPage");
+router.get('/add', (_req, res) => {
+  res.render('add-product', {
+    headTitle: 'Shop – Add product',
+    path: '/add',
+    menuLinks: MENU_LINKS,
+    activeLinkPath: '/products/add',
+  })
+})
 
-const router = express.Router();
+router.post('/add', (req, res) => {
+  const { name, description } = req.body
+  const product = { name, description }
+  productsSlice.newestProduct = product
+  productsSlice.products.push(product)
+  res.status(STATUS_CODE.FOUND).redirect('/products/new')
+})
 
-router.get("/add", (_request, response) => {
-  response.sendFile(path.join(__dirname, "../views", "add-product.html"));
-});
+router.get('/new', (_req, res) => {
+  res.render('newest-product', {
+    headTitle: 'Shop – Newest product',
+    path: '/new',
+    menuLinks: MENU_LINKS,
+    activeLinkPath: '/products/new',
+    newestProduct: productsSlice.newestProduct,
+  })
+})
 
-router.post("/add", (request, response) => {
-  const { name, description } = request.body;
-
-  fileSystem.writeFile(
-    "product.txt",
-    `Name: ${name}, Description: ${description}`,
-    (error) => {
-      if (error) {
-        throw error;
-      }
-
-      response.status(STATUS_CODE.FOUND).redirect("/product/new");
-    }
-  );
-});
-
-router.get("/new", (_request, response) => {
-  fileSystem.readFile("product.txt", "utf-8", (_error, data) => {
-    response.send(renderNewProductPage(data));
-  });
-});
-
-module.exports = router;
+module.exports = router
